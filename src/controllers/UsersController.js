@@ -1,13 +1,13 @@
 
 class UsersController {
   async create(request, response) {
-    const { name, email, password} = request.body;
+    const { name, email, password } = request.body;
     
     if(!name){
       throw new AppError("Nome é obrigatório");
     }
 
-    response.json({ name, email, password});
+    response.status(201).json({ name, email, password});
   }
 }
 

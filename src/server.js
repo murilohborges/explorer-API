@@ -5,6 +5,7 @@ require("express-async-errors");
 const AppError = require("./utils/AppError");
 
 const app = express();
+app.use(express.json());
 
 const routes = require("./routes");
 app.use(routes);
