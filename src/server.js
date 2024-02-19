@@ -2,7 +2,11 @@ const express = require('express');
 
 require("express-async-errors");
 
+const migrationsRun = require("./database/sqlite/migrations")
+
 const AppError = require("./utils/AppError");
+
+migrationsRun();
 
 const app = express();
 app.use(express.json());
