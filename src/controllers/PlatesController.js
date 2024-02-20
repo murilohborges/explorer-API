@@ -65,13 +65,22 @@ class PlatesController {
 
     }else{
 
-      plates = await knex("plates").where({ user_id }).whereLike("name", `%${name}%`).orderBy("name");
+      plates = await knex("plates").where({ user_id }).whereLike("title", `%${title}%`).orderBy("title");
 
     }
 
+    const userIngredients = await knex("ingredients").where({ user_id });
+    const platesWithIngredients = plates.map(plate => {
+      const plateIngredients = userIngredients.filter(ingredient => ingredient.plate_id === plate.id);
+
+      return {
+        ...plate,
+        ingredients: plateIngredients
+      }
+    });
     
 
-    return response.json(plates);
+    return response.json(platesWithIngredients);
 
   }
 }
