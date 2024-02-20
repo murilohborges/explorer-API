@@ -4,11 +4,11 @@ const knex = require("../database/knex");
 
 class PlatesController {
   async create(request, response) {
-    const { name, category, price, description, ingredients } = request.body;
+    const { title, category, price, description, ingredients } = request.body;
     const { user_id } = request.params;
 
     const [plate_id] = await knex("plates").insert({
-      name, 
+      title, 
       category, 
       price, 
       description,
@@ -50,16 +50,23 @@ class PlatesController {
   }
 
   async index(request, response) {
-    const { name, user_id, ingredients } = request.query;
+    const { title, user_id, ingredients } = request.query;
 
     let plates;
 
     if(ingredients){
       const filterIngredients = ingredients.split(',').map(ingredient => ingredient.trim());
 
-      plates = await knex("ingredients").whereIn("name", filterIngredients);
+      plates = await knex("ingredients").select([
+        "plates.id",
+        "plates.title",
+        "plates.user_id"
+      ]).where("plates.user_id", user_id).whereLike("plates.title", `%${title}%`).whereIn("name", filterIngredients).innerJoin("plates", "plates.id", "ingredients.plate_id").orderBy("plates.title");
+
     }else{
+
       plates = await knex("plates").where({ user_id }).whereLike("name", `%${name}%`).orderBy("name");
+
     }
 
     

@@ -6,4 +6,4 @@ exports.up = knex => knex.schema.createTable("ingredients", table => {
 });
 
 
-exports.down = knex => knex.schema.dropTable("plates");
+exports.down = knex => knex.schema.dropTable("ingredients");
