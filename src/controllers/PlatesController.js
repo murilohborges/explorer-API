@@ -1,6 +1,7 @@
 const sqliteConnection = require("../database/sqlite");
 const { response } = require("express");
 const knex = require("../database/knex");
+const AppError = require("../utils/AppError")
 
 class PlatesController {
   async create(request, response) {
@@ -82,6 +83,56 @@ class PlatesController {
 
     return response.json(platesWithIngredients);
 
+  }
+
+  async update(request, response) {
+    const { title, category, price, description, ingredients } = request.body;
+    const { id } = request.params;
+
+    const database = await sqliteConnection();
+    const plate = await database.get("SELECT * FROM plates WHERE id = (?)", [id]);
+    const user_id = plate.user_id;
+
+    if (!plate) {
+      throw new AppError("Prato não encontrado");
+    }
+
+    const plateWithUpdatedTitle = await database.get("SELECT * FROM plates WHERE title = (?)", [title]);
+
+    if(plateWithUpdatedTitle && plateWithUpdatedTitle.id !== plate.id) {
+      throw new AppError("Este título de prato já está em uso.");
+    }
+
+    plate.title = title ?? plate.title;
+    plate.category = category ?? plate.category;
+    plate.price = price ?? plate.price;
+    plate.description = description ?? plate.description;
+
+    await database.run(`
+    UPDATE plates SET
+    title = ?,
+    category = ?,
+    price = ?,
+    description = ?,
+    updated_at = DATETIME('now')
+    WHERE id = ?`,
+    [plate.title, plate.category, plate.price, plate.description, id]);
+
+    const ingredientsUpdatedInsert = ingredients.map(name => {
+      return {
+        plate_id: Number(id),
+        name,
+        user_id: String(user_id)
+      }
+    })
+
+    console.log(ingredientsUpdatedInsert);
+
+    await knex("ingredients").where("plate_id", id).delete();
+
+    await knex("ingredients").insert(ingredientsUpdatedInsert);
+
+    return response.status(200).json();
   }
 }
 
