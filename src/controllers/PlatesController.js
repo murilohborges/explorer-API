@@ -6,7 +6,7 @@ const AppError = require("../utils/AppError")
 class PlatesController {
   async create(request, response) {
     const { title, category, price, description, ingredients } = request.body;
-    const { user_id } = request.params;
+    const user_id = request.user.id;
 
     const [plate_id] = await knex("plates").insert({
       title, 
@@ -51,7 +51,8 @@ class PlatesController {
   }
 
   async index(request, response) {
-    const { title, user_id, ingredients } = request.query;
+    const { title, ingredients } = request.query;
+    const user_id = request.user.id;
 
     let plates;
 
@@ -88,10 +89,10 @@ class PlatesController {
   async update(request, response) {
     const { title, category, price, description, ingredients } = request.body;
     const { id } = request.params;
+    const user_id = request.user.id;
 
     const database = await sqliteConnection();
     const plate = await database.get("SELECT * FROM plates WHERE id = (?)", [id]);
-    const user_id = plate.user_id;
 
     if (!plate) {
       throw new AppError("Prato não encontrado");
@@ -125,9 +126,7 @@ class PlatesController {
         user_id: String(user_id)
       }
     })
-
-    console.log(ingredientsUpdatedInsert);
-
+    
     await knex("ingredients").where("plate_id", id).delete();
 
     await knex("ingredients").insert(ingredientsUpdatedInsert);
