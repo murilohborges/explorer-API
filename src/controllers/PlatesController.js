@@ -32,7 +32,7 @@ class PlatesController {
   async show(request, response) {
     const { id } = request.params;
 
-    const plate = await knex("plates").where({ id }).first();
+    const plate = await knex("plates").where({ id });
     const ingredients = await knex("ingredients").where({ plate_id: id }).orderBy("name");
   
     return response.json({
