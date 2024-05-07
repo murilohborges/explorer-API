@@ -11,6 +11,7 @@ const upload = multer(uploadConfig.MULTER);
 const platesController = new PlatesController();
 const plateAvatarController = new PlateAvatarController();
 
+
 platesRoutes.use(ensureAuthenticated);
 
 

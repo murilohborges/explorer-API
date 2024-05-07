@@ -52,7 +52,6 @@ class PlatesController {
 
   async index(request, response) {
     const { title, ingredients } = request.query;
-    const user_id = request.user.id;
 
     let plates;
 
@@ -62,32 +61,20 @@ class PlatesController {
       plates = await knex("ingredients").select([
         "plates.id",
         "plates.title",
-        "plates.user_id"
-      ]).where("plates.user_id", user_id).whereLike("plates.title", `%${title}%`).whereIn("name", filterIngredients).innerJoin("plates", "plates.id", "ingredients.plate_id").orderBy("plates.title");
+      ]).whereLike("plates.title", `%${title}%`).whereIn("name", filterIngredients).innerJoin("plates", "plates.id", "ingredients.plate_id").orderBy("plates.title");
 
     }else{
 
-      plates = await knex("plates").where({ user_id }).whereLike("title", `%${title}%`).orderBy("title");
+      plates = await knex("plates").whereLike("title", `%${title}%`).orderBy("title");
 
     }
 
-    const userIngredients = await knex("ingredients").where({ user_id });
-    const platesWithIngredients = plates.map(plate => {
-      const plateIngredients = userIngredients.filter(ingredient => ingredient.plate_id === plate.id);
-
-      return {
-        ...plate,
-        ingredients: plateIngredients
-      }
-    });
-    
-
-    return response.json(platesWithIngredients);
+    return response.json(plates);
 
   }
 
   async update(request, response) {
-    const { title, category, price, description, ingredients } = request.body;
+    const { avatar, title, category, price, description, ingredients } = request.body;
     const { id } = request.params;
     const user_id = request.user.id;
 
@@ -104,6 +91,7 @@ class PlatesController {
       throw new AppError("Este título de prato já está em uso.");
     }
 
+    plate.avatar = avatar ?? plate.avatar;
     plate.title = title ?? plate.title;
     plate.category = category ?? plate.category;
     plate.price = price ?? plate.price;
