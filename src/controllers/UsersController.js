@@ -17,6 +17,10 @@ class UsersController {
       throw new AppError("Nome é obrigatório");
     }
 
+    if(password.length < 6){
+      throw new AppError("Senha deve possuir no mínimo 6 caracteres");
+    }
+
     const hashedPassword = await hash(password, 8);
 
     await database.run("INSERT INTO users (name, email, password) VALUES (?, ?, ?)", 
