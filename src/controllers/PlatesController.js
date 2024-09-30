@@ -1,7 +1,9 @@
 const sqliteConnection = require("../database/sqlite");
 const { response } = require("express");
 const knex = require("../database/knex");
-const AppError = require("../utils/AppError")
+const AppError = require("../utils/AppError");
+const fs = require('fs-js');
+const path = require('path')
 
 class PlatesController {
   async create(request, response) {
@@ -43,11 +45,18 @@ class PlatesController {
 
   async delete(request, response) {
     const { id } = request.params;
+    const dataPlate = await knex("plates").where({ id })
+    const avatarFileName = dataPlate[0].avatar;
+
+    fs.unlink(path.join(__dirname, `../../tmp/uploads/${avatarFileName}`), (err) => {
+      if (err) throw err;
+      console.log('successfully deleted imagem');
+    });
 
     await knex("plates").where({ id }).delete();
 
-    return response.json();
 
+    return response.json();
   }
 
   async index(request, response) {
