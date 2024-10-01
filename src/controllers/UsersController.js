@@ -34,6 +34,7 @@ class UsersController {
     const { name, email, password, old_password } = request.body;
     const user_id = request.user.id;
 
+
     const database = await sqliteConnection();
     const user = await database.get("SELECT * FROM users WHERE id = (?)", [user_id]);
 
@@ -47,11 +48,14 @@ class UsersController {
       throw new AppError("Este e-mail já está em uso.");
     }
 
-    user.name = name ?? user.name;
-    user.email = email ?? user.email;
-
+    user.name = name == "" ? user.name : name;
+    user.email = email == "" ? user.email : email;
     if (password && !old_password) {
       throw new AppError("Você deve informar a senha antiga")
+    }
+    
+    if(password.length < 6){
+      throw new AppError("Senha deve possuir no mínimo 6 caracteres");
     }
 
     if (password && old_password) {
@@ -73,7 +77,7 @@ class UsersController {
     WHERE id = ?`,
     [user.name, user.email, user.password, user_id]);
 
-    return response.status(200).json();
+    return response.status(200).json({ });
   }
 
 }
