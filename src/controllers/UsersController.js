@@ -31,8 +31,8 @@ class UsersController {
   }
 
   async update(request, response) {
-    const { name, email, password, old_password } = request.body;
-    const user_id = request.user.id;
+    const { user_id, name, email, password, old_password } = request.body;
+    // const user_id = request.user.id;
 
 
     const database = await sqliteConnection();
@@ -50,21 +50,22 @@ class UsersController {
 
     user.name = name == "" ? user.name : name;
     user.email = email == "" ? user.email : email;
+
     if (password && !old_password) {
       throw new AppError("Você deve informar a senha antiga")
     }
-    
-    if(password.length < 6){
-      throw new AppError("Senha deve possuir no mínimo 6 caracteres");
-    }
 
     if (password && old_password) {
+      if(password.length < 6){
+        throw new AppError("Senha deve possuir no mínimo 6 caracteres");
+      }
+      
       const checkOldPassword = await compare(old_password, user.password);
 
       if(!checkOldPassword) {
         throw new AppError("A senha antiga não confere");
       }
-
+      
       user.password = await hash(password, 8);
     }
 
