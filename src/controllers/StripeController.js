@@ -36,6 +36,7 @@ class StripeController {
       throw new AppError("Erro ao avançar para Checkout");
     }
   }
+
   
 }
 module.exports = StripeController

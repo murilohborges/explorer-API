@@ -6,9 +6,9 @@ const verifyUserAuthorization = require("../middleware/verifyUserAuthorization.j
 
 const stripeController = new StripeController();
 
-stripeRoutes.use(ensureAuthenticated);
+// stripeRoutes.use(ensureAuthenticated);
 
-stripeRoutes.post("/", verifyUserAuthorization("customer"), stripeController.create);
+stripeRoutes.post("/", stripeController.create);
 
 
 module.exports = stripeRoutes;

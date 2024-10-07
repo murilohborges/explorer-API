@@ -1,9 +1,9 @@
 const sqliteConnection = require("../database/sqlite");
+const { response } = require("express");
 const knex = require("../database/knex");
 const AppError = require("../utils/AppError");
 const fs = require('fs-js');
-const path = require('path');
-const moment = require('moment-timezone');
+const path = require('path')
 
 class PlatesController {
   async create(request, response) {
@@ -17,18 +17,6 @@ class PlatesController {
       description,
       user_id
     })
-
-    const plate = await knex('plates').where({ id: plate_id }).first();
-
-    const adjustedTimeCreated = moment.utc(plate.created_at).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss');
-    const adjustedTimeUpdated = moment.utc(plate.updated_at).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss');
-
-    await knex('plates')
-    .where({ id: plate_id })
-    .update({
-      created_at: adjustedTimeCreated, // Substitui o valor original com a data ajustada
-      updated_at: adjustedTimeUpdated // Substitui o valor original com a data ajustada
-    });
 
     const ingredientsInsert = ingredients.map(name => {
       return {
@@ -124,7 +112,7 @@ class PlatesController {
     category = ?,
     price = ?,
     description = ?,
-    updated_at = DATETIME('now', 'localtime')
+    updated_at = DATETIME('now')
     WHERE id = ?`,
     [plate.title, plate.category, plate.price, plate.description, id]);
 
