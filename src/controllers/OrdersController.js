@@ -4,11 +4,17 @@ const moment = require('moment-timezone');
 
 class OrdersController {
   async create(request, response){
-    const { status, details } = request.body;
+    const { details } = request.body;
+
+    
+    let detailsArray = details.map((item) => {
+      let itemArray = `${item.plate_amount} x ${item.plate_title}`
+      return itemArray
+    });
 
     const [order_id] = await knex('orders').insert({
-      status,
-      details
+      status: "pending",
+      details: String(detailsArray.join(', '))
     });
 
     const order = await knex('orders').where({ id: order_id }).first();
