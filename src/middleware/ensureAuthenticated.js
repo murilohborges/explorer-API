@@ -10,8 +10,15 @@ function ensureAuthenticated(request, response, next){
   }
   
   const tokens = authHeader.cookie.split(";");
-  
-  const token = tokens[0].split("=")[1].trim();
+
+  const authToken = tokens.map((item)=>{{
+    let isAuthToken = item.includes('token=');
+    if(isAuthToken == true){
+      return item
+    }
+  }})
+
+  const token = authToken[0].split("=")[1].trim();
 
   try {
     const { role, sub: user_id } = verify(token, authConfig.jwt.secret);
