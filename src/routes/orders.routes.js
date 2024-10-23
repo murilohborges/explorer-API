@@ -10,6 +10,7 @@ ordersRoutes.use(ensureAuthenticated);
 
 ordersRoutes.post("/", ordersController.create);
 ordersRoutes.get("/", ordersController.index);
+ordersRoutes.put("/", ordersController.update);
 
 
 module.exports = ordersRoutes;
