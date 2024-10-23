@@ -6,9 +6,10 @@ const verifyUserAuthorization = require("../middleware/verifyUserAuthorization.j
 
 const webhookController = new WebhookController();
 
-// stripeRoutes.use(ensureAuthenticated);
+webhookRoutes.use(ensureAuthenticated);
 
 webhookRoutes.post("/", webhookController.create);
+webhookRoutes.get("/", webhookController.index);
 
 
 module.exports = webhookRoutes;
