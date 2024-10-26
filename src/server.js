@@ -10,13 +10,17 @@ const uploadConfig = require('./configs/upload');
 const cookieParser = require("cookie-parser");
 
 const app = express();
-app.use(cookieParser())
-app.use(cors());
+app.use(cookieParser());
 app.use('/webhook', bodyParser.raw({ type: 'application/json' }));
 
 app.use(express.json());
 
 app.use("/files", express.static(uploadConfig.UPLOADS_FOLDER));
+
+app.use(cors({
+  origin: 'https://foodexplorer-murilohborges.netlify.app',
+  credentials: true,
+}));
 
 const routes = require("./routes");
 app.use(routes);
