@@ -8,7 +8,7 @@ const stripeController = new StripeController();
 
 stripeRoutes.use(ensureAuthenticated);
 
-stripeRoutes.post("/", verifyUserAuthorization("customer"), stripeController.create);
+stripeRoutes.post("/create-checkout-session", verifyUserAuthorization("customer"), stripeController.create);
 
 
 module.exports = stripeRoutes;
