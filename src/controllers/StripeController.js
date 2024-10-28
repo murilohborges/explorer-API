@@ -6,7 +6,7 @@ class StripeController {
   async create(request, response){
     const database = await knex("plates");
     const listItems = database.map((item) => {
-      let stripeItem = [item.id, {priceInReal: (item.price * 100), name: item.title}]
+      let stripeItem = [item.id, {priceInReal: Math.round((item.price * 100)), name: item.title}]
       return stripeItem
     });
     const storeItemsForStripe = new Map(listItems);
