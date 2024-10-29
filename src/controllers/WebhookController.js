@@ -6,14 +6,14 @@ const { verify, sign } = require("jsonwebtoken");
 class WebhookController {
   async create(request, response){
     const sig = request.headers['stripe-signature'];
-
     let event;
     
     try {
       event = stripe.webhooks.constructEvent(request.body, sig, `${process.env.WEBHOOK_SIGNING_SECRET}`);
+      console.log(event)
 
     } catch (e) {
-      throw new AppError('Erro de verificação de assinatura:');
+      throw new AppError(`Erro de verificação de assinatura:`, e.message);
     }
 
     if (event.type === 'payment_intent.succeeded') {
