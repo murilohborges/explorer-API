@@ -8,8 +8,8 @@ const webhookController = new WebhookController();
 
 webhookRoutes.use(ensureAuthenticated);
 
-webhookRoutes.post("/", webhookController.create);
-webhookRoutes.get("/", webhookController.index);
+webhookRoutes.post("/", verifyUserAuthorization("customer"), webhookController.create);
+webhookRoutes.get("/", verifyUserAuthorization("customer"), webhookController.index);
 
 
 module.exports = webhookRoutes;
