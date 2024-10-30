@@ -35,12 +35,13 @@ class WebhookController {
         httpOnly: true,
         sameSite: "none",
         secure: true,
-        maxAge: 1 * 30 * 1000
+        maxAge: 60 * 1000
       })
 
+      return response.status(201).json({ message: "Token de pagamento gerado com sucesso" });
     }
     
-    return response.status(201).json({});
+    return response.status(400).json({ error: "Tipo de evento não suportado" });
   }
 
   async index(request, response){
