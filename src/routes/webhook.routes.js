@@ -6,10 +6,8 @@ const verifyUserAuthorization = require("../middleware/verifyUserAuthorization.j
 
 const webhookController = new WebhookController();
 
-webhookRoutes.use(ensureAuthenticated);
-
-webhookRoutes.post("/", verifyUserAuthorization("customer"), webhookController.create);
-webhookRoutes.get("/", verifyUserAuthorization("customer"), webhookController.index);
+webhookRoutes.post("/", webhookController.create);
+webhookRoutes.get("/", webhookController.index);
 
 
 module.exports = webhookRoutes;
