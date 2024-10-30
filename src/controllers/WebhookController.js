@@ -38,10 +38,9 @@ class WebhookController {
         maxAge: 60 * 1000
       })
 
-      return response.status(201).json({ message: "Token de pagamento gerado com sucesso" });
     }
     
-    return response.status(400).json({ error: "Tipo de evento não suportado" });
+    return response.status(201).json({ message: "Token de pagamento gerado com sucesso" });
   }
 
   async index(request, response){
