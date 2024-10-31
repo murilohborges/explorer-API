@@ -25,6 +25,7 @@ class WebhookController {
         currency: paymentIntent.currency,
         status: paymentIntent.status,
       };
+      console.log(`tokenPayload:${tokenPayload}`)
 
       const { secret } = authConfig.jwt;
       const paymentToken = sign(tokenPayload, secret, {
