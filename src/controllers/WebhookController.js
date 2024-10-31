@@ -11,7 +11,6 @@ class WebhookController {
     try {
       const payload = request.body.toString('utf8');
       event = stripe.webhooks.constructEvent(payload, sig, `${process.env.WEBHOOK_SIGNING_SECRET}`);
-      console.log(event)
       
     } catch (e) {
       throw new AppError(`Erro de verificação de assinatura:`, e.message);
@@ -19,18 +18,20 @@ class WebhookController {
     
     if (event.type === 'payment_intent.succeeded') {
       const paymentIntent = event.data.object;
-
+      
       const tokenPayload = {
         paymentIntentId: paymentIntent.id,
         amount: paymentIntent.amount,
         currency: paymentIntent.currency,
         status: paymentIntent.status,
       };
+      console.log(tokenPayload)
       
       const { secret } = authConfig.jwt;
       const paymentToken = sign(tokenPayload, secret, {
         expiresIn: '60s'
       })
+      console.log(paymentToken)
 
       response.cookie("paymentToken", paymentToken, {
         httpOnly: true,
