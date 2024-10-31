@@ -16,7 +16,7 @@ class WebhookController {
     }
     
     if (event.type === 'payment_intent.succeeded') {
-      const paymentIntent = event.object;
+      const paymentIntent = event.data.object;
       console.log(`paymentIntent:${paymentIntent}`)
 
       const tokenPayload = {
