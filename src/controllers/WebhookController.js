@@ -25,13 +25,11 @@ class WebhookController {
         currency: paymentIntent.currency,
         status: paymentIntent.status,
       };
-      console.log(tokenPayload)
       
       const { secret } = authConfig.jwt;
       const paymentToken = sign(tokenPayload, secret, {
         expiresIn: '60s'
       })
-      console.log(paymentToken)
 
       response.cookie("paymentToken", paymentToken, {
         httpOnly: true,
