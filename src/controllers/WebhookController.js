@@ -14,31 +14,47 @@ class WebhookController {
     } catch (e) {
       throw new AppError(`Erro de verificação de assinatura:`, e.message);
     }
-    console.log("event:")
-    console.log(event)
 
-    console.log("event.data:")
-    console.log(event.data)
-
-    
-    // if (event.type === 'payment_intent.succeeded') {
-    //   // const paymentIntent = event.data.object;
+    if (event.type === 'payment_intent.succeeded') {
+      const paymentIntent = event.data.object;
       
-    //   // const tokenPayload = {
-    //   //   paymentIntentId: paymentIntent.id,
-    //   //   amount: paymentIntent.amount,
-    //   //   currency: paymentIntent.currency,
-    //   //   status: paymentIntent.status,
-    //   // };
-
-    //   const tokenPayload = { teste: 'asjndkjan' }
+      const tokenPayload = {
+        paymentIntentId: paymentIntent.id,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency,
+        status: paymentIntent.status,
+      };
       
-    //   const { secret } = authConfig.jwt;
-    //   const paymentToken = sign(tokenPayload, secret, {
-    //     expiresIn: '60s'
-    //   })
+      const { secret } = authConfig.jwt;
+      const paymentToken = sign(tokenPayload, secret, {
+        expiresIn: '60s'
+      })
 
-    // }
+    }
+
+    if (event.type === 'payment_intent.succeeded') {
+      const paymentIntent = event.data.object;
+      console.log('paymentIntent:')
+      console.log(paymentIntent)
+      
+      const tokenPayload = {
+        paymentIntentId: paymentIntent.id,
+        amount: paymentIntent.amount,
+        currency: paymentIntent.currency,
+        status: paymentIntent.status,
+      };
+      
+      const { secret } = authConfig.jwt;
+      const paymentToken = sign(tokenPayload, secret, {
+        expiresIn: '60s'
+      })
+    }
+
+    if(event.type === 'checkout.session.completed'){
+      const session_id = event.data.object.id;
+      console.log('session_id:')
+      console.log(session_id)
+    }
     
     return response.status(201).json({ message: "Token de pagamento gerado com sucesso" });
   }
