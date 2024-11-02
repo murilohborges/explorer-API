@@ -11,17 +11,11 @@ function ensureAuthenticated(request, response, next){
   
   const tokens = authHeader.cookie.split(";");
 
-  const authToken = tokens.map((item)=>{{
-    let isAuthToken = item.includes('token=');
-    if(isAuthToken == true){
-      return item
-    }
-  }})
-
-  const token = authToken[0].split("=")[1].trim();
+  const authToken = tokens.filter((item) => item.includes('authToken='))
+  const tokenForAuth = authToken[0].split("=")[1].trim();
 
   try {
-    const { role, sub: user_id } = verify(token, authConfig.jwt.secret);
+    const { role, sub: user_id } = verify(tokenForAuth, authConfig.jwt.secret);
     
     request.user = {
       id: Number(user_id),
