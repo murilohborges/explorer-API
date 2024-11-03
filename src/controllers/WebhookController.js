@@ -49,9 +49,6 @@ class WebhookController {
       .update({
         created_at: adjustedTime // Substitui o valor original com a data ajustada
       });
-      
-      const actualPaymentToken = await knex('payment_tokens')
-      .where({ id: paymentToken_id })
     }
     
 
