@@ -11,6 +11,7 @@ class WebhookController {
     let event;
     let paymentToken;
     let session_id;
+    let payment_status;
 
     try {
       const payload = request.body.toString('utf8');
@@ -19,23 +20,17 @@ class WebhookController {
       throw new AppError(`Erro de verificação de assinatura:`, e.message);
     }
 
-    if (event.type === 'payment_intent.succeeded') {
-      const paymentIntent = event.data.object;
-      
+    if(event.type === 'checkout.session.completed'){
+      payment_status = event.data.object.payment_status
       const tokenPayload = {
-        paymentIntentId: paymentIntent.id,
-        amount: paymentIntent.amount,
-        currency: paymentIntent.currency,
-        status: paymentIntent.status,
+        paymentStatus: payment_status
       };
+      console.log(tokenPayload)
       
       const { secret } = authConfig.jwt;
       paymentToken = sign(tokenPayload, secret, {
-        expiresIn: '60s'
+        expiresIn: '1d'
       })
-    }
-
-    if(event.type === 'checkout.session.completed'){
       session_id = event.data.object.id;
     }
     
@@ -57,7 +52,6 @@ class WebhookController {
       
       const actualPaymentToken = await knex('payment_tokens')
       .where({ id: paymentToken_id })
-      console.log(actualPaymentToken)
     }
     
 
