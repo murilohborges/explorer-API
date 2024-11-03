@@ -9,7 +9,7 @@ class WebhookController {
   async create(request, response){
     const sig = request.headers['stripe-signature'];
     let event;
-    let paymentToken = 'testoned';
+    let paymentToken;
     let session_id;
 
     try {
