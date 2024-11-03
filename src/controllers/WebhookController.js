@@ -2,11 +2,15 @@ const stripe = require("stripe")(process.env.STRIPE_PRIVATE_KEY);
 const AppError = require("../utils/AppError");
 const authConfig = require("../configs/auth");
 const { verify, sign } = require("jsonwebtoken");
+const knex = require("../database/knex");
+const moment = require('moment-timezone');
 
 class WebhookController {
   async create(request, response){
     const sig = request.headers['stripe-signature'];
     let event;
+    let paymentToken = 'testoned';
+    let session_id;
 
     try {
       const payload = request.body.toString('utf8');
@@ -26,35 +30,37 @@ class WebhookController {
       };
       
       const { secret } = authConfig.jwt;
-      const paymentToken = sign(tokenPayload, secret, {
-        expiresIn: '60s'
-      })
-
-    }
-
-    if (event.type === 'payment_intent.succeeded') {
-      const paymentIntent = event.data.object;
-      console.log('paymentIntent:')
-      console.log(paymentIntent)
-      
-      const tokenPayload = {
-        paymentIntentId: paymentIntent.id,
-        amount: paymentIntent.amount,
-        currency: paymentIntent.currency,
-        status: paymentIntent.status,
-      };
-      
-      const { secret } = authConfig.jwt;
-      const paymentToken = sign(tokenPayload, secret, {
+      paymentToken = sign(tokenPayload, secret, {
         expiresIn: '60s'
       })
     }
 
     if(event.type === 'checkout.session.completed'){
-      const session_id = event.data.object.id;
-      console.log('session_id:')
-      console.log(session_id)
+      session_id = event.data.object.id;
     }
+    
+    if(paymentToken !== undefined && session_id !== undefined){
+      const [paymentToken_id] = await knex('payment_tokens').insert({
+        token: paymentToken,
+        sessionId: session_id
+      });
+  
+      const paymentTokenToAdjustTime = await knex('payment_tokens').where({ id: paymentToken_id }).first();
+      
+      const adjustedTime = moment.utc(paymentTokenToAdjustTime.created_at).tz('America/Sao_Paulo').format('YYYY-MM-DD HH:mm:ss');
+  
+      await knex('payment_tokens')
+      .where({ id: paymentToken_id })
+      .update({
+        created_at: adjustedTime // Substitui o valor original com a data ajustada
+      });
+      
+      const actualPaymentToken = await knex('payment_tokens')
+      .where({ id: paymentToken_id })
+      console.log(actualPaymentToken)
+    }
+    
+
     
     return response.status(201).json({ message: "Token de pagamento gerado com sucesso" });
   }
