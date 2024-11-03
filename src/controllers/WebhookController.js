@@ -62,19 +62,40 @@ class WebhookController {
   async index(request, response){
     const authHeader = request.headers;
     const tokens = authHeader.cookie.split(";");
-    const paymentToken = tokens[1].split("paymentToken=")[1].trim();
-
-    if (!paymentToken) {
-      throw new AppError('Token de pagamento não encontrado.');
+    const tokenSession = tokens.filter((item) => item.includes('tokenSession='))
+    const tokenForSessionStripe = tokenSession[0].split("=")[1].trim();
+    
+    let sessionIdFromClient;
+    let paymentToken;
+    let statusPayment;
+    
+    try {
+      const { session_id } = verify(tokenForSessionStripe, authConfig.jwt.secret);
+      sessionIdFromClient = session_id
+      
+    } catch{
+      throw new AppError("JWT Token Inválido do cookie do cliente", 401);
+    }
+    
+    
+    
+    try {
+      const registerPaymentToken = await knex('payment_tokens').where({ sessionId: sessionIdFromClient})
+      paymentToken = registerPaymentToken[0].token;
+      
+    } catch{
+      throw new AppError("Sessão da Stripe não encontrada", 400);
     }
 
     try {
-      // Verifique o token (por exemplo, usando JWT)
-      const { paymentIntentId } = verify(paymentToken, authConfig.jwt.secret);
-      return response.json({ status: 'ok', paymentIntentId });
+      const { paymentStatus } = verify(paymentToken, authConfig.jwt.secret);
+      statusPayment = paymentStatus
+    } catch{
+      throw new AppError("JWT Token Inválido do token do servidor", 401);
+    }
 
-    } catch (error) {
-      throw new AppError('Token de pagamento inválido ou expirado.');
+    if( statusPayment === "paid"){
+      return response.status(200).json({ message: "Pagamento confirmado!" });
     }
   }
   
