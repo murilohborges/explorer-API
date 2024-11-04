@@ -25,7 +25,6 @@ class WebhookController {
       const tokenPayload = {
         paymentStatus: payment_status
       };
-      console.log(tokenPayload)
       
       const { secret } = authConfig.jwt;
       paymentToken = sign(tokenPayload, secret, {
@@ -51,8 +50,6 @@ class WebhookController {
       });
     }
     
-
-    
     return response.status(201).json({ message: "Token de pagamento gerado com sucesso" });
   }
 
@@ -74,8 +71,6 @@ class WebhookController {
       throw new AppError("JWT Token Inválido do cookie do cliente", 401);
     }
     
-    
-    
     try {
       const registerPaymentToken = await knex('payment_tokens').where({ sessionId: sessionIdFromClient})
       paymentToken = registerPaymentToken[0].token;
@@ -92,6 +87,7 @@ class WebhookController {
     }
 
     if( statusPayment === "paid"){
+      await knex('payment_tokens').where({ sessionId: sessionIdFromClient }).del();
       return response.status(200).json({ message: "Pagamento confirmado!" });
     }
   }
