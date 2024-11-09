@@ -1,5 +1,6 @@
 const sqliteConnection = require("../database/sqlite");
 const { hash, compare } = require("bcryptjs");
+const knex = require("../database/knex");
 const AppError = require("../utils/AppError")
 
 class UsersController {
@@ -79,6 +80,17 @@ class UsersController {
     [user.name, user.email, user.password, user_id]);
 
     return response.status(200).json({ });
+  }
+
+  async index(request, response) {
+    const { user_id_customer } = request.query;
+    try{
+      const customer = await knex('users').where({ id: Number(user_id_customer) });
+      const customer_name = customer[0].name;
+      return response.status(200).json({ customer_name });
+    }catch(e){
+      throw new AppError("Cliente não encontrado!")
+    }
   }
 
 }
