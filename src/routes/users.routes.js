@@ -10,5 +10,6 @@ const usersController = new UsersController();
 usersRoutes.post("/", usersController.create);
 usersRoutes.put("/", ensureAuthenticated, usersController.update);
 usersRoutes.get("/validated", ensureAuthenticated, usersValidatedController.index);
+usersRoutes.get("/", usersController.index);
 
 module.exports = usersRoutes;
