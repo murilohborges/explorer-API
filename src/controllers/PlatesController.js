@@ -60,10 +60,12 @@ class PlatesController {
     const dataPlate = await knex("plates").where({ id })
     const avatarFileName = dataPlate[0].avatar;
 
-    fs.unlink(path.join(__dirname, `../../tmp/uploads/${avatarFileName}`), (err) => {
-      if (err) throw err;
-      console.log('successfully deleted imagem');
-    });
+    if(avatarFileName){
+      fs.unlink(path.join(__dirname, `../../tmp/uploads/${avatarFileName}`), (err) => {
+        if (err) throw err;
+        console.log('successfully deleted imagem');
+      });
+    }
 
     await knex("plates").where({ id }).delete();
 
