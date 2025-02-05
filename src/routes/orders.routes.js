@@ -8,9 +8,9 @@ const ordersController = new OrdersController();
 
 ordersRoutes.use(ensureAuthenticated);
 
-ordersRoutes.post("/", ordersController.create);
+ordersRoutes.post("/", verifyUserAuthorization("admin"), ordersController.create);
 ordersRoutes.get("/", ordersController.index);
-ordersRoutes.put("/", ordersController.update);
+ordersRoutes.put("/", verifyUserAuthorization("admin"), ordersController.update);
 
 
 module.exports = ordersRoutes;
